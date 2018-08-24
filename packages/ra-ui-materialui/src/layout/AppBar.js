@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { createElement } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
@@ -52,7 +52,7 @@ const styles = theme => ({
     },
 });
 
-const AppBar = ({
+const MuiAppBarComponent = ({
     children,
     classes,
     className,
@@ -66,7 +66,7 @@ const AppBar = ({
     <MuiAppBar
         className={classNames(classes.appBar, className)}
         color="secondary"
-        position={width === 'xs' ? 'fixed' : 'absolute'}
+        position="static"
         {...rest}
     >
         <Toolbar
@@ -100,7 +100,7 @@ const AppBar = ({
     </MuiAppBar>
 );
 
-AppBar.propTypes = {
+MuiAppBarComponent.propTypes = {
     children: PropTypes.node,
     classes: PropTypes.object,
     className: PropTypes.string,
@@ -110,6 +110,20 @@ AppBar.propTypes = {
         .isRequired,
     toggleSidebar: PropTypes.func.isRequired,
     width: PropTypes.string,
+};
+
+const AppBar = ({ appBarContainer, ...props }) =>
+    createElement(appBarContainer, {}, <MuiAppBarComponent {...props} />);
+
+const DefaultAppBarContainer = props => <div {...props} />;
+
+AppBar.propTypes = {
+    ...MuiAppBarComponent.propTypes,
+    appBarContainer: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+};
+
+AppBar.defaultProps = {
+    appBarContainer: DefaultAppBarContainer,
 };
 
 const enhance = compose(
