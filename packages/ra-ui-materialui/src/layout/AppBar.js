@@ -1,4 +1,4 @@
-import React, { createElement } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classNames from 'classnames';
@@ -14,15 +14,9 @@ import { toggleSidebar as toggleSidebarAction } from 'ra-core';
 
 import LoadingIndicator from './LoadingIndicator';
 import UserMenu from './UserMenu';
+import Headroom from './Headroom';
 
 const styles = theme => ({
-    appBar: {
-        transition: theme.transitions.create(['margin', 'width'], {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        zIndex: 1300,
-    },
     toolbar: {
         paddingRight: 24,
     },
@@ -52,7 +46,7 @@ const styles = theme => ({
     },
 });
 
-const MuiAppBarComponent = ({
+const AppBar = ({
     children,
     classes,
     className,
@@ -61,46 +55,49 @@ const MuiAppBarComponent = ({
     title,
     toggleSidebar,
     width,
+    containerStyle,
     ...rest
 }) => (
-    <MuiAppBar
-        className={classNames(classes.appBar, className)}
-        color="secondary"
-        position="static"
-        {...rest}
-    >
-        <Toolbar
-            disableGutters
-            variant={width === 'xs' ? 'regular' : 'dense'}
-            className={classes.toolbar}
+    <Headroom style={containerStyle}>
+        <MuiAppBar
+            className={className}
+            color="secondary"
+            position="static"
+            {...rest}
         >
-            <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                onClick={toggleSidebar}
-                className={classNames(classes.menuButton)}
+            <Toolbar
+                disableGutters
+                variant={width === 'xs' ? 'regular' : 'dense'}
+                className={classes.toolbar}
             >
-                <MenuIcon
-                    classes={{
-                        root: open
-                            ? classes.menuButtonIconOpen
-                            : classes.menuButtonIconClosed,
-                    }}
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    onClick={toggleSidebar}
+                    className={classNames(classes.menuButton)}
+                >
+                    <MenuIcon
+                        classes={{
+                            root: open
+                                ? classes.menuButtonIconOpen
+                                : classes.menuButtonIconClosed,
+                        }}
+                    />
+                </IconButton>
+                <Typography
+                    variant="title"
+                    color="inherit"
+                    className={classes.title}
+                    id="react-admin-title"
                 />
-            </IconButton>
-            <Typography
-                variant="title"
-                color="inherit"
-                className={classes.title}
-                id="react-admin-title"
-            />
-            <LoadingIndicator />
-            {logout && <UserMenu logout={logout}>{children}</UserMenu>}
-        </Toolbar>
-    </MuiAppBar>
+                <LoadingIndicator />
+                {logout && <UserMenu logout={logout}>{children}</UserMenu>}
+            </Toolbar>
+        </MuiAppBar>
+    </Headroom>
 );
 
-MuiAppBarComponent.propTypes = {
+AppBar.propTypes = {
     children: PropTypes.node,
     classes: PropTypes.object,
     className: PropTypes.string,
@@ -110,20 +107,7 @@ MuiAppBarComponent.propTypes = {
         .isRequired,
     toggleSidebar: PropTypes.func.isRequired,
     width: PropTypes.string,
-};
-
-const AppBar = ({ appBarContainer, ...props }) =>
-    createElement(appBarContainer, {}, <MuiAppBarComponent {...props} />);
-
-const DefaultAppBarContainer = props => <div {...props} />;
-
-AppBar.propTypes = {
-    ...MuiAppBarComponent.propTypes,
-    appBarContainer: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
-};
-
-AppBar.defaultProps = {
-    appBarContainer: DefaultAppBarContainer,
+    containerStyle: PropTypes.object,
 };
 
 const enhance = compose(
